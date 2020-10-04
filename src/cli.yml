@@ -1,0 +1,23 @@
+name: Generate code from a Mermaid markdown file
+version: "1.0"
+author: Roberts Ivanovs <robertsivanovs1999@gmail.com>
+about: Will speed up the flashing process. At least will try to
+args:
+    - input-file:
+        long: input-file
+        value_name: INPUT
+        help: Input file to parse
+        required: true
+        takes_value: false
+        index: 1
+    - output-language:
+        value_name: LANGUAGE
+        help: Language code to generate
+        possible_values: [django]
+        required: true
+        takes_value: false
+    - output-file:
+        value_name: OUTPUT
+        help: Output file
+        required: true
+        takes_value: true
