@@ -27,7 +27,7 @@ fn main() -> std::io::Result<()> {
 
     // ----------Parsing to an abstract language tree-----//
     let ast_classes = parse_to_ast(&contents);
-    println!("{:?}",ast_classes);
+    println!("{:#?}",ast_classes);
     // ------------------File output----------------------//
 
     Ok(())
