@@ -1,8 +1,8 @@
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ASTAttribute {
-    data_type: String,
-    name: String,
+    pub data_type: String,
+    pub name: String,
 }
 
 impl ASTAttribute {
@@ -13,9 +13,9 @@ impl ASTAttribute {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ASTFunction {
-    return_type: String,
-    name: String,
-    parameters: Vec<ASTAttribute>,
+    pub return_type: String,
+    pub name: String,
+    pub parameters: Vec<ASTAttribute>,
 }
 
 impl ASTFunction {

@@ -1,9 +1,12 @@
 mod ast;
+mod output;
 
 #[macro_use]
 extern crate clap;
+use crate::output::generate_data;
 use ast::parse_to_ast;
 use clap::{App, ArgMatches};
+use output::OutputTypes;
 
 
 use std::fs::File;
@@ -25,10 +28,13 @@ fn main() -> std::io::Result<()> {
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
 
-    // ----------Parsing to an abstract language tree-----//
+    // ----------Parsing the data-----//
     let ast_classes = parse_to_ast(&contents);
-    println!("{:#?}",ast_classes);
+    let final_output = generate_data(&ast_classes, &OutputTypes::Django);
     // ------------------File output----------------------//
+
+    let mut file = File::create(&output_file_path)?;
+    file.write_all(final_output.as_bytes())?;
 
     Ok(())
 }
