@@ -1,19 +1,20 @@
 mod ast;
+mod common;
+mod languages;
 mod output;
 
 #[macro_use]
 extern crate clap;
+use crate::common::Parsable;
 use crate::output::generate_data;
 use ast::parse_to_ast;
 use clap::{App, ArgMatches};
-use output::OutputTypes;
-
+use languages::Django;
 
 use std::fs::File;
 use std::io::prelude::*;
 
 fn main() -> std::io::Result<()> {
-
     let yaml = load_yaml!("cli.yml");
     let matches = App::from_yaml(yaml).get_matches();
 
@@ -22,6 +23,7 @@ fn main() -> std::io::Result<()> {
     let language_code_to_generate = matches.value_of("output-language").unwrap();
     let output_file_path = matches.value_of("output-file").unwrap();
 
+    // let output_construction = get_language_server(language_code_to_generate);
 
     // ------------------File reading-------------------- //
     let mut file = File::open(file_path_to_parse)?;
@@ -30,7 +32,7 @@ fn main() -> std::io::Result<()> {
 
     // ----------Parsing the data-----//
     let ast_classes = parse_to_ast(&contents);
-    let final_output = generate_data(&ast_classes, &OutputTypes::Django);
+    let final_output = generate_data(&ast_classes, Django::new());
     // ------------------File output----------------------//
 
     let mut file = File::create(&output_file_path)?;

@@ -1,25 +1,27 @@
+use crate::common::DataType;
+
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ASTAttribute {
-    pub data_type: String,
+    pub data_type: DataType,
     pub name: String,
 }
 
 impl ASTAttribute {
-    pub fn new(data_type: String, name: String) -> Self {
+    pub fn new(data_type: DataType, name: String) -> Self {
         Self { data_type, name }
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ASTFunction {
-    pub return_type: String,
+    pub return_type: DataType,
     pub name: String,
     pub parameters: Vec<ASTAttribute>,
 }
 
 impl ASTFunction {
-    pub fn new(return_type: String, name: String, parameters: Vec<ASTAttribute>) -> Self {
+    pub fn new(return_type: DataType, name: String, parameters: Vec<ASTAttribute>) -> Self {
         Self {
             return_type,
             name,
@@ -48,3 +50,4 @@ impl ASTClass {
         }
     }
 }
+

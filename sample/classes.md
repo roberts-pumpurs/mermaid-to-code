@@ -17,8 +17,8 @@
         +string adrese
         +bool WiFi
         +bool autostavvieta
-        +bool bārs
-        +bool restorāns
+        +bool bars
+        +bool restorans
         +bool fitnesa centrs
         +bool SPA centrs
         +bool peldbaseins
