@@ -1,7 +1,7 @@
 ```mermaid
  classDiagram
 
-    Persona <|-- Lietotajs
+    Persona "1" <|-- "1" Lietotajs
     Viesnica "1" o-- "1..N" Istabina
     Atsauksmes "0..N" --* "1" Viesnica
     TuvumaEsosiApskatesObjekti "0..N" o--o "0..M" Viesnica
