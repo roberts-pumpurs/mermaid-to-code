@@ -30,27 +30,7 @@ From a [mermaid](https://mermaid-js.github.io/mermaid/) code like this:
 
 which, with the help of Mermaid JS generates a diagram like this
 
-<!-- ![Class diagram](docs/classes.png) -->
-```mermaid
- classDiagram
-
-    A "1" o-- "1..N" B
-    B "N" *--* "M" C
-    A "0..N" --* "1" C
-
-    class A {
-        +int vertejums
-        +string atsauksme
-    }
-    class B {
-        +string nosaukums
-        +string atrasanas vieta
-        +string apraksts
-    }
-    class C {
-        +string tips
-    }
-```
+![Class diagram](docs/classes.png)
 
 and with the help of this utility code generates this:
 
