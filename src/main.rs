@@ -32,6 +32,10 @@ fn main() -> std::io::Result<()> {
 
     // ----------Parsing the data-----//
     let ast_classes = parse_to_ast(&contents);
+    let ast_classes = match ast_classes {
+        Ok(val) => val,
+        Err(val) => panic!("\nError occurred {}", val),
+    };
     let final_output = generate_data(&ast_classes, Django::new());
     // ------------------File output----------------------//
 

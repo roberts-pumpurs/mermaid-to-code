@@ -19,5 +19,15 @@ pub enum DataType {
     INTEGER,
     // Foreign key to another class
     FOREIGNKEY(String),
+    MANYTOMANY(String),
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum RelationEndian {
+    ZERO,
+    ONE,
+    MANY,
+    ZEROTILONE,
+    ZEROTILMANY,
+    ONETILMANY,
+}

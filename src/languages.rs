@@ -31,7 +31,7 @@ impl Parsable for Django {
             .iter()
             .map(|x| self.parse_attribute(x))
             .collect();
-        let attributes_as_str = attributes.join(&indent);
+        let mut attributes_as_str = attributes.join(&indent);
 
         let functions: Vec<String> = class
             .functions
@@ -41,7 +41,9 @@ impl Parsable for Django {
         let functions_as_str = functions.join(&indent);
 
         let class_decl = format!("class {name}(models.Model):\n", name = class.name);
-
+        if functions_as_str == "" && attributes_as_str == "" {
+            attributes_as_str = format!("{}pass\n", indent);
+        }
         format!(
             "{}{}{}{}",
             class_decl, indent, attributes_as_str, functions_as_str
@@ -58,6 +60,7 @@ impl Parsable for Django {
             DataType::FOREIGNKEY(to) => format!("ForeignKey({})", &to),
             DataType::BOOL => "BooleanField()".to_owned(),
             DataType::INTEGER => "IntegerField()".to_owned(),
+            DataType::MANYTOMANY(to) => format!("ManyToManyField({})", &to),
         };
 
         format!(
@@ -68,6 +71,7 @@ impl Parsable for Django {
     }
 
     fn parse_function(&self, function: &ASTFunction) -> String {
+        let indent = self.get_indent();
         let params: Vec<String> = function
             .parameters
             .iter()
@@ -75,9 +79,10 @@ impl Parsable for Django {
             .collect();
         let params_str = params.join(", ");
         format!(
-            "def {name}({params}):\n    pass\n",
+            "def {name}({params}):\n{indent}pass\n",
             name = function.name,
-            params = params_str
+            params = params_str,
+            indent = indent,
         )
     }
 
@@ -91,6 +96,7 @@ impl Parsable for Django {
             DataType::BOOL => "bool".to_owned(),
             DataType::INTEGER => "int".to_owned(),
             DataType::FOREIGNKEY(obj) => obj.clone(),
+            DataType::MANYTOMANY(obj) => obj.clone(),
         }
     }
     fn imports(&self) -> &str {
