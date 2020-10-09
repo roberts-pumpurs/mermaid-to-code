@@ -1,9 +1,5 @@
 # Generate code from a mermaid markdown file
 
-Currently supported backends:
-
-- Django
-
 ## Example
 
 From a [mermaid](https://mermaid-js.github.io/mermaid/) code like this:
@@ -59,14 +55,18 @@ class B(models.Model):
 Follow the pattern of `[executable] [input file] [backend] [output file]`
 
 Example:
-```
+```sh
 ./target/release/mermaid-parser sample/classes.md django output/models.py
 ```
 
 ## Compilation
 
-```
+```sh
 cargo build --release
 ```
 
+## Backends
 
+Currently supported backends:
+
+- Django
