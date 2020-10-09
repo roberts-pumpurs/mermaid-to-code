@@ -57,10 +57,10 @@ impl Parsable for Django {
             DataType::DATETIME => "DateTimeField()".to_owned(),
             DataType::DOUBLE => "FloatField()".to_owned(),
             DataType::CHAR => "CharField(max_length=1)".to_owned(),
-            DataType::FOREIGNKEY(to) => format!("ForeignKey({})", &to),
+            DataType::FOREIGNKEY(to) => format!("ForeignKey('{}')", &to),
             DataType::BOOL => "BooleanField()".to_owned(),
             DataType::INTEGER => "IntegerField()".to_owned(),
-            DataType::MANYTOMANY(to) => format!("ManyToManyField({})", &to),
+            DataType::MANYTOMANY(to) => format!("ManyToManyField('{}')", &to),
         };
 
         format!(

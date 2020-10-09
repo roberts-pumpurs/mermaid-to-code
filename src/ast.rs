@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use regex::Regex;
 pub use structs::{ASTAttribute, ASTClass, ASTFunction};
 
-use crate::common::{DataType, RelationEndian};
+use crate::common::{DataType, ManySubtypes, RelationEndian};
 
 pub fn parse_to_ast(input: &str) -> Result<HashMap<String, ASTClass>, String> {
     let lines_lowercase = input.to_ascii_lowercase();
@@ -35,7 +35,8 @@ pub fn parse_to_ast(input: &str) -> Result<HashMap<String, ASTClass>, String> {
                     .to_owned()
                     .trim_matches('{')
                     .trim()
-                    .to_owned().to_uppercase();
+                    .to_owned()
+                    .to_uppercase();
 
                 if result.contains_key(&name) {
                     empty_class = result
@@ -96,14 +97,15 @@ pub fn parse_to_ast(input: &str) -> Result<HashMap<String, ASTClass>, String> {
                 .collect();
             let left_obj: &str = relations_filtered[0].as_ref();
             let right_obj: &str = relations_filtered[4].as_ref();
-            let left_cardinality = convert_cardinality(relations_filtered[1].as_ref()).ok_or_else(|| {
-                format!(
-                    "Entity relation error, no such relation {}",
-                    relations_filtered[1]
-                )
-            })?;
-            let right_cardinality =
-                convert_cardinality(relations_filtered[3].as_ref()).ok_or_else(|| {
+            let left_cardinality =
+                convert_cardinality(relations_filtered[1].as_ref()).ok_or_else(|| {
+                    format!(
+                        "Entity relation error, no such relation {}",
+                        relations_filtered[1]
+                    )
+                })?;
+            let right_cardinality = convert_cardinality(relations_filtered[3].as_ref())
+                .ok_or_else(|| {
                     format!(
                         "Entity relation error, no such relation {}",
                         relations_filtered[3]
@@ -117,8 +119,18 @@ pub fn parse_to_ast(input: &str) -> Result<HashMap<String, ASTClass>, String> {
                 result.insert(right_obj.to_string(), ASTClass::new(right_obj.to_string()));
             }
 
-            if left_cardinality == RelationEndian::ONE && right_cardinality == RelationEndian::MANY
-            {
+            let right_is_many = match right_cardinality {
+                RelationEndian::ZERO => false,
+                RelationEndian::ONE => false,
+                RelationEndian::MANY(_) => true,
+            };
+            let left_is_many = match left_cardinality {
+                RelationEndian::ZERO => false,
+                RelationEndian::ONE => false,
+                RelationEndian::MANY(_) => true,
+            };
+
+            if !left_is_many && right_is_many {
                 let mut val = result
                     .remove(right_obj)
                     .ok_or_else(|| "Inconsistent HashMap write/read")?;
@@ -127,9 +139,7 @@ pub fn parse_to_ast(input: &str) -> Result<HashMap<String, ASTClass>, String> {
                     format!("{}_fk", left_obj),
                 ));
                 result.insert(right_obj.to_string(), val);
-            } else if left_cardinality == RelationEndian::MANY
-                && right_cardinality == RelationEndian::ONE
-            {
+            } else if !right_is_many && left_is_many {
                 let mut val = result
                     .remove(left_obj)
                     .ok_or_else(|| "Inconsistent HashMap write/read")?;
@@ -138,13 +148,7 @@ pub fn parse_to_ast(input: &str) -> Result<HashMap<String, ASTClass>, String> {
                     format!("{}_fk", right_obj),
                 ));
                 result.insert(left_obj.to_string(), val);
-            } else if (left_cardinality == RelationEndian::MANY
-                || left_cardinality == RelationEndian::ZEROTILMANY
-                || left_cardinality == RelationEndian::ONETILMANY)
-                && (right_cardinality == RelationEndian::MANY
-                    || right_cardinality == RelationEndian::ZEROTILMANY
-                    || right_cardinality == RelationEndian::ONETILMANY)
-            {
+            } else if left_is_many && right_is_many {
                 let mut val = result
                     .remove(left_obj)
                     .ok_or_else(|| "Inconsistent HashMap write/read")?;
@@ -164,13 +168,13 @@ fn convert_cardinality(one_endian: &str) -> Option<RelationEndian> {
     match one_endian.as_ref() {
         "0" => Some(RelationEndian::ZERO),
         "1" => Some(RelationEndian::ONE),
-        "N" => Some(RelationEndian::MANY),
-        "M" => Some(RelationEndian::MANY),
-        "0..N" => Some(RelationEndian::ZEROTILMANY),
-        "1..N" => Some(RelationEndian::ONETILMANY),
-        "0..M" => Some(RelationEndian::ZEROTILMANY),
-        "1..M" => Some(RelationEndian::ONETILMANY),
-        "0..1" => Some(RelationEndian::ZEROTILONE),
+        "N" => Some(RelationEndian::MANY(ManySubtypes::UNKONOWN)),
+        "M" => Some(RelationEndian::MANY(ManySubtypes::UNKONOWN)),
+        "0..N" => Some(RelationEndian::MANY(ManySubtypes::ZEROTILMANY)),
+        "1..N" => Some(RelationEndian::MANY(ManySubtypes::ONETILMANY)),
+        "0..M" => Some(RelationEndian::MANY(ManySubtypes::ZEROTILMANY)),
+        "1..M" => Some(RelationEndian::MANY(ManySubtypes::ONETILMANY)),
+        "0..1" => Some(RelationEndian::MANY(ManySubtypes::ZEROTILONE)),
         _ => None,
     }
 }

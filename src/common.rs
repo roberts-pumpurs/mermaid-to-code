@@ -26,7 +26,12 @@ pub enum DataType {
 pub enum RelationEndian {
     ZERO,
     ONE,
-    MANY,
+    MANY(ManySubtypes),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum ManySubtypes {
+    UNKONOWN,
     ZEROTILONE,
     ZEROTILMANY,
     ONETILMANY,
