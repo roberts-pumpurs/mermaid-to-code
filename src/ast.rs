@@ -51,30 +51,28 @@ pub fn parse_to_ast(input: &str) -> Result<HashMap<String, ASTClass>, String> {
             let captures = function_or_attribute.captures(&line);
             match captures {
                 Some(capture) => {
-                    if line.contains("(") {
-                        // TODO handle functions
+                    let split: Vec<&str> = capture[0].split(" ").collect();
+                    let data_type = split.get(0).unwrap().to_owned().to_owned();
+                    let name = split.get(1).unwrap().to_owned().to_owned();
+
+                    let dt_enum = match data_type.as_ref() {
+                        "string" => DataType::STRING,
+                        "float" => DataType::FLOAT,
+                        "int" => DataType::INTEGER,
+                        "bool" => DataType::BOOL,
+                        "datetime" => DataType::DATETIME,
+                        "double" => DataType::DOUBLE,
+                        "char" => DataType::CHAR,
+                        _ => DataType::FOREIGNKEY(data_type.clone()),
+                    };
+
+                    if line.contains("(") && line.contains(")") {
+                        // TODO handle input parameters for functions
+                        let name_from_func: Vec<&str> = name.split("(").collect();
+                        let name = name_from_func.get(0).unwrap().to_owned().to_owned();
+                        let function_line = ASTFunction::new(dt_enum, name, Vec::new());
+                        empty_class.functions.push(function_line)
                     } else {
-                        let split: Vec<&str> = capture[0].split(" ").collect();
-                        let data_type = split.get(0).unwrap().to_owned().to_owned();
-                        let name = split.get(1).unwrap().to_owned().to_owned();
-
-                        let mut dt_enum = DataType::FOREIGNKEY(data_type.clone());
-                        if data_type == "string" {
-                            dt_enum = DataType::STRING;
-                        } else if data_type == "float" {
-                            dt_enum = DataType::FLOAT;
-                        } else if data_type == "int" {
-                            dt_enum = DataType::INTEGER;
-                        } else if data_type == "bool" {
-                            dt_enum = DataType::BOOL;
-                        } else if data_type == "datetime" {
-                            dt_enum = DataType::DATETIME;
-                        } else if data_type == "double" {
-                            dt_enum = DataType::DOUBLE;
-                        } else if data_type == "char" {
-                            dt_enum = DataType::CHAR;
-                        }
-
                         let attribute_line = ASTAttribute::new(dt_enum, name.to_owned());
                         empty_class.attributes.push(attribute_line)
                     }

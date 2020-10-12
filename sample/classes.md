@@ -8,11 +8,13 @@
     class A {
         +int vertejums
         +string atsauksme
+        +int func()
     }
     class B {
         +string nosaukums
         +string atrasanas vieta
         +string apraksts
+        +A func_2()
     }
     class C {
         +string tips

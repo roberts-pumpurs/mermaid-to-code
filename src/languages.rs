@@ -38,15 +38,31 @@ impl Parsable for Django {
             .iter()
             .map(|x| self.parse_function(x))
             .collect();
-        let functions_as_str = functions.join(&indent);
+
+        // Add extra indent
+        let functions: Vec<String> = functions
+            .iter()
+            .map(|x| {
+                x.split("\n")
+                    .map(|y| {
+                        if y == format!("{}pass", &indent) {
+                            format!("{}{}\n", &indent, y)
+                        } else {
+                            format!("{}\n", y)
+                        }
+                    })
+                    .collect()
+            })
+            .collect();
+        let functions_as_str = functions.join("\n");
 
         let class_decl = format!("class {name}(models.Model):\n", name = class.name);
         if functions_as_str == "" && attributes_as_str == "" {
             attributes_as_str = format!("{}pass\n", indent);
         }
         format!(
-            "{}{}{}{}",
-            class_decl, indent, attributes_as_str, functions_as_str
+            "{}{}{}{}{}",
+            class_decl, indent, attributes_as_str, indent, functions_as_str
         )
     }
 
